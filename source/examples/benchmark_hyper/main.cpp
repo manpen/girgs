@@ -29,7 +29,6 @@ void benchmark(std::ostream& os, unsigned int n, unsigned int avgDeg, double alp
 
         // Preprocess
         auto addEdge = [&counter_num_edges] (int, int, int tid) {counter_num_edges.add(tid);};
-
         hypergirgs::HyperbolicTree<decltype(addEdge)> generator = [&] {
             ScopedTimer timer("Preprocess", time_preprocess);
             return hypergirgs::makeHyperbolicTree(radii, angles, T, R, addEdge);
@@ -44,20 +43,24 @@ void benchmark(std::ostream& os, unsigned int n, unsigned int avgDeg, double alp
 
     const auto num_edges = counter_num_edges.total();
 
-    std::stringstream ss;
-    ss << "[DATA] "
-       << std::setw(10) << n << ","
-       << std::setw(10) << avgDeg << ","
-       << std::setw(10) << alpha << ","
-       << std::setw(10) << T << ","
-       << std::setw(10) << time_total      << ","
-       << std::setw(10) << time_points     << ","
-       << std::setw(10) << time_preprocess << ","
-       << std::setw(10) << time_sample << ","
-       << std::setw(10) << num_edges << ","
-       << std::setw(10) << (2.0 * num_edges / n);
+    // Logging
+    {
+        std::stringstream ss;
+        ss << "[DATA] "
+           << std::setw(11) << "NewPrepro,"
+           << std::setw(10) << n << ","
+           << std::setw(10) << avgDeg << ","
+           << std::setw(10) << alpha << ","
+           << std::setw(10) << T << ","
+           << std::setw(10) << time_total      << ","
+           << std::setw(10) << time_points     << ","
+           << std::setw(10) << time_preprocess << ","
+           << std::setw(10) << time_sample << ","
+           << std::setw(10) << num_edges << ","
+           << std::setw(10) << (2.0 * num_edges / n);
 
-    os << ss.str() << std::endl;
+        os << ss.str() << std::endl;
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -69,6 +72,7 @@ int main(int argc, char* argv[]) {
     {
         std::stringstream ss;
         ss << "[DATA] "
+           << std::setw(11) << "algo,"
            << std::setw(11) << "n,"
            << std::setw(11) << "avgDeg,"
            << std::setw(11) << "alpha,"
@@ -76,19 +80,25 @@ int main(int argc, char* argv[]) {
            << std::setw(11) << "TimeTotal,"
            << std::setw(11) << "TimePoints,"
            << std::setw(11) << "TimePrepro,"
-           << std::setw(11) << "TimeSample,"
+           << std::setw(11) << "TimeEdges,"
            << std::setw(11) << "GenNumEdge,"
            << std::setw(10) << "GenAvgDeg";
+
 
         std::cout << ss.str() << std::endl;
     }
 
 
-    for(unsigned int n = 1024; n < (2 << 24); n *= 2) {
-        for(unsigned avgDeg : {10, 100, 1000}) {
-            if (avgDeg * 10 > n) continue;
-            benchmark(std::cout, n, avgDeg, alpha, T, seed);
-            seed += 10;
+    for(unsigned int iter = 0; iter != 5; ++iter) {
+        for (unsigned int n = 1024; n < (2 << 24); n *= 2) {
+            for (unsigned avgDeg : {10, 100, 1000}) {
+                if (avgDeg * 10 > n) continue;
+
+                std::clog << "iter=" << iter << ", n=" << n << ", avgDeg=" << avgDeg << "\n";
+
+                benchmark(std::cout, n, avgDeg, alpha, T, seed);
+                seed += 10;
+            }
         }
     }
 
