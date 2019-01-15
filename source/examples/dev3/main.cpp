@@ -20,21 +20,37 @@ int main(int argc, char* argv[]) {
     const auto angleSeed = 130;
     const auto edgesSeed = 1400;
 
-    std::vector<std::pair<int,int>> graph;
-    graph.reserve(n*deg/2);
-    auto addEdge = [&graph] (int u, int v, int tid) {
-        assert(tid == 0);
-        graph.emplace_back(u,v);
+    using counter_with_padding = std::pair<uint64_t, char[64]>;
+    std::vector<counter_with_padding> num_edges_per_thread(omp_get_thread_num());
+    for(auto& x: num_edges_per_thread) x.first = 0;
+
+    auto addEdge = [&num_edges_per_thread] (int u, int v, int tid) {
+        num_edges_per_thread[tid].first++;
     };
 
     auto R = hypergirgs::calculateRadius(n, alpha, T, deg);
-    auto radii = hypergirgs::sampleRadii(n, alpha, R, radiiSeed);
-    auto angles = hypergirgs::sampleAngles(n, angleSeed);
-    auto generator = hypergirgs::makeHyperbolicTree(radii, angles, T, R, addEdge);
 
-    // measure
-    auto start = std::chrono::high_resolution_clock::now();
-    generator.generate(edgesSeed);
-    auto end = std::chrono::high_resolution_clock::now();
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count() << std::endl;
+    double time_points, time_preprocess, time_sample;
+
+    // Sample points
+    std::vector<double> radii, angles;
+    {
+        ScopedTimer timer("Generate points", time_points);
+        radii = hypergirgs::sampleRadii(n, alpha, R, radiiSeed);
+        angles = hypergirgs::sampleAngles(n, angleSeed);
+    }
+
+    // Preprocess
+    auto generator = [&] {
+        ScopedTimer timer("Preprocess", time_preprocess);
+        return hypergirgs::makeHyperbolicTree(radii, angles, T, R, addEdge);
+    }();
+
+    // Generate edges
+    {
+        ScopedTimer timer("Generate edges", time_sample);
+        generator.generate(edgesSeed);
+    }
+
+
 }

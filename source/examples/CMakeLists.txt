@@ -6,6 +6,7 @@ endif()
 
 # Example applications
 add_subdirectory(benchmark)
+add_subdirectory(benchmark_hyper)
 add_subdirectory(dev)
 add_subdirectory(dev2)
 add_subdirectory(dev3)

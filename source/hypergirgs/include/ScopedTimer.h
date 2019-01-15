@@ -54,6 +54,11 @@ public:
 
     ScopedTimer(double& output) : _begin(Clock::now()), _scale(1), _offset(0), _output(&output) {}
 
+    ScopedTimer(const std::string& prefix, double& output)
+        : _prefix(prefix), _begin(Clock::now()), _scale(1), _offset(0), _output(&output)
+    {}
+
+
     ~ScopedTimer() {
         if (!_prefix.empty())
             report();
