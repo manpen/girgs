@@ -47,7 +47,7 @@ void benchmark(std::ostream& os, unsigned int n, unsigned int avgDeg, double alp
     {
         std::stringstream ss;
         ss << "[DATA] "
-           << std::setw(11) << "NewPrepro,"
+           << std::setw(11) << "OldPrepro,"
            << std::setw(10) << n << ","
            << std::setw(10) << avgDeg << ","
            << std::setw(10) << alpha << ","
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
 
 
     for(unsigned int iter = 0; iter != 5; ++iter) {
-        for (unsigned int n = 1024; n < (2 << 24); n *= 2) {
+        for (unsigned int n = 1024; n < (2 << 23); n *= 2) {
             for (unsigned avgDeg : {10, 100, 1000}) {
                 if (avgDeg * 10 > n) continue;
 
