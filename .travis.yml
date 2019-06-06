@@ -8,6 +8,25 @@ env:
 matrix:
   include:
 
+    - env:
+        - CMAKE_CONFIGURATION=debug BUILD_DIR=build-debug
+      os: osx
+      osx_image: xcode10.2
+      sudo: false
+      addons:
+        homebrew:
+          packages:
+            - libomp
+
+    - env:
+        - CMAKE_CONFIGURATION=build BUILD_DIR=build
+      os: osx
+      osx_image: xcode10.2
+      sudo: false
+      addons:
+        homebrew:
+          packages:
+            - libomp
 # xcode 9.1 has no proper openMP support
 #    - os: osx
 #      osx_image: xcode9.1
@@ -50,6 +69,8 @@ matrix:
       env:
         - CMAKE_CONFIGURATION=debug BUILD_DIR=build-debug
         - CMAKE_GENERATOR_OVERRIDE="Visual Studio 15 2017 Win64"
+
+
 
 before_script:
   - eval "${MATRIX_EVAL}"
