@@ -4,6 +4,7 @@
 docker build -t girgs_common common
 
 docker build -t girgs_networkit networkit
+docker build -t girgs_networkit_polylog networkit_polylog
 
 git clone .. girgs/source
 docker build --no-cache  -t girgs_girgs girgs

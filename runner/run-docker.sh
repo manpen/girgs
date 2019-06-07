@@ -13,4 +13,5 @@ $DOCKER_CMD -v $DATADIR:/data --entrypoint /usr/bin/benchmark-hypergen.sh -t gir
 $DOCKER_CMD -v $DATADIR:/data -t girgs_hypergen
 $DOCKER_CMD -v $DATADIR:/data -t girgs_hypergirgs
 $DOCKER_CMD -v $DATADIR:/data -t girgs_networkit
+$DOCKER_CMD -v $DATADIR:/data -t girgs_networkit_polylog
 $DOCKER_CMD -v $DATADIR:/data -t girgs_girgs
